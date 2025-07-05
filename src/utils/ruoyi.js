@@ -1,4 +1,4 @@
-
+import request from '@/utils/request'
 
 /**
  * 通用js方法封装处理
@@ -263,14 +263,18 @@ export function numSub(num1, num2) {
   return Number(((num1 * baseNum - num2 * baseNum) / baseNum).toFixed(precision));
 }
 
-export function generateNo() {
-  // 获取当前日期
-  const now = new Date();
-  // 获取月和日
-  const month = String(now.getMonth() + 1).padStart(2, '0'); // getMonth() 返回的是0-11，所以需要加1
-  const day = String(now.getDate()).padStart(2, '0'); // getDate() 返回的是1-31
-  // 生成 0 到 9999 之间的随机整数
-  const randomNum = Math.floor(Math.random() * 10000);
-  // 返回
-  return month + '' + day + '' + String(randomNum).padStart(4, '0');
+export function generateNo(voucherTypeCode) {
+  return request({
+    url: '/system/voucher/getVoucherNumber?voucherCode='+voucherTypeCode,
+    method: 'get'
+  })
+  // // 获取当前日期
+  // const now = new Date();
+  // // 获取月和日
+  // const month = String(now.getMonth() + 1).padStart(2, '0'); // getMonth() 返回的是0-11，所以需要加1
+  // const day = String(now.getDate()).padStart(2, '0'); // getDate() 返回的是1-31
+  // // 生成 0 到 9999 之间的随机整数
+  // const randomNum = Math.floor(Math.random() * 10000);
+  // // 返回
+  // return month + '' + day + '' + String(randomNum).padStart(4, '0');
 }

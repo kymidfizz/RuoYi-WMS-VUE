@@ -29,7 +29,7 @@
             </el-col>
           </el-row>
         </el-form>
-            <el-table :data="list" @selection-change="handleSelectionChange" border :row-key="getRowKey" empty-text="暂无商品" v-loading="loading" ref="skuSelectFormRef" cell-class-name="my-cell">
+            <el-table :data="list" @selection-change="handleSelectionChange" border :row-key="getRowKey" empty-text="暂无商品" v-loading="loading" ref="skuSelectFormRef" cell-class-name="my-cell" @row-click="handleRowClick">
               <el-table-column type="selection" width="55" :reserve-selection="true" v-if="!singleSelect" :selectable="judgeSelectable"/>
               <el-table-column label="商品信息" prop="itemId">
                 <template #default="{ row }">
@@ -233,6 +233,14 @@ const getVolumeText = (row) => {
     + ((row.width || row.width === 0) ? (' 宽：' + row.width) : '')
     + ((row.height || row.height === 0) ? (' 高：' + row.height) : '')
 }
+
+// 新增：点击行时切换选中状态
+function handleRowClick(row) {
+  if (!props.singleSelect) {
+    skuSelectFormRef.value.toggleRowSelection(row)
+  }
+}
+
 defineExpose({
   getList
 })

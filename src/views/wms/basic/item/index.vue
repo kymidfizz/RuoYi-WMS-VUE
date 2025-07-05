@@ -736,13 +736,26 @@ const getVolumeText = (itemSku) => {
     + ((itemSku.width || itemSku.width === 0) ? (' 宽：' + itemSku.width) : '')
     + ((itemSku.height || itemSku.height === 0) ? (' 高：' + itemSku.height) : '')
 }
+
+const itemId = route.query.id;
+
 onMounted(() => {
-  nextTick(()=>{
-    getList();
-    if (route.query.openDrawer) {
-      handleAdd()
-    }
-  })
+  if (itemId) {
+    listItemSkuPage({ id: itemId }).then(res => {
+      const content = [...res.rows];
+      itemList.value = content.map((it) => ({...it, id: it.skuId,itemId: it?.item?.id}));
+      total.value = res.total;
+      loading.value = false;
+      itemList.value = res.rows || res.data || [];
+    });
+  } else {
+    nextTick(() => {
+      getList();
+      if (route.query.openDrawer) {
+        handleAdd();
+      }
+    });
+  }
 });
 </script>
 <style>

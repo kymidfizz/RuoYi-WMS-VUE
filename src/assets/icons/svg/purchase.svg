@@ -1,0 +1,38 @@
+<svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
+  <!-- 购物车主体 - 使用更复杂的path -->
+  <path d="M20 60h88v48H20z" fill="#165DFF" stroke="#0F4CD1" stroke-width="2"/>
+  
+  <!-- 购物车手柄 - 更精细的设计 -->
+  <path d="M88 40h8v20h-8z" fill="#165DFF"/>
+  <path d="M92 36h8v8h-8z" fill="#165DFF"/>
+  
+  <!-- 购物车轮子 - 更精细的轮子设计 -->
+  <circle cx="32" cy="108" r="8" fill="#E0E2E5" stroke="#C0C4CC" stroke-width="2"/>
+  <circle cx="96" cy="108" r="8" fill="#E0E2E5" stroke="#C0C4CC" stroke-width="2"/>
+  <circle cx="32" cy="108" r="3" fill="#909399"/>
+  <circle cx="96" cy="108" r="3" fill="#909399"/>
+  
+  <!-- 商品盒子 - 更精细的盒子设计 -->
+  <path d="M28 68h16v12H28z" fill="#FFFFFF" stroke="#E0E2E5" stroke-width="1"/>
+  <path d="M48 68h16v12H48z" fill="#FFFFFF" stroke="#E0E2E5" stroke-width="1"/>
+  <path d="M68 68h16v12H68z" fill="#FFFFFF" stroke="#E0E2E5" stroke-width="1"/>
+  
+  <!-- 商品标签 - 更精细的标签设计 -->
+  <path d="M30 70h12v2H30z" fill="#165DFF"/>
+  <path d="M50 70h12v2H50z" fill="#00B42A"/>
+  <path d="M70 70h12v2H70z" fill="#F7BA2E"/>
+  
+  <!-- 采购箭头 - 更精细的箭头设计 -->
+  <path d="M64 20L64 10M58 14L64 10L70 14" stroke="#165DFF" stroke-width="3" fill="none" stroke-linecap="round"/>
+  
+  <!-- 采购符号 - 更复杂的购物袋设计 -->
+  <path d="M45 25h38v16H45z" fill="#165DFF" rx="2"/>
+  <path d="M49 29h30v8H49z" fill="#FFFFFF"/>
+  <path d="M55 35h18v4H55z" fill="#00B42A"/>
+  <path d="M59 37h10v2H59z" fill="#FFFFFF"/>
+  
+  <!-- 采购细节 - 添加更多精细元素 -->
+  <path d="M52 32h24v2H52z" fill="#FFFFFF"/>
+  <path d="M54 36h20v2H54z" fill="#FFFFFF"/>
+  <path d="M56 40h16v2H56z" fill="#FFFFFF"/>
+</svg>

@@ -141,6 +141,8 @@
 <script setup name="Merchant">
 import { listMerchant, getMerchant, delMerchant, addMerchant, updateMerchant } from "@/api/wms/merchant";
 import {ElMessageBox} from "element-plus";
+import { useRoute } from "vue-router";
+import { onMounted } from "vue";
 
 const { proxy } = getCurrentInstance();
 const { merchant_type } = proxy.useDict('merchant_type');
@@ -176,6 +178,8 @@ const data = reactive({
 });
 
 const { queryParams, form, rules } = toRefs(data);
+
+const route = useRoute();
 
 /** 查询往来单位列表 */
 function getList() {
@@ -292,8 +296,21 @@ function handleDelete(row) {
 function handleExport() {
   proxy.download('wms/merchant/export', {
     ...queryParams.value
-  }, `merchant_${new Date().getTime()}.xlsx`)
+  }, `merchant_${new Date()}.xlsx`)
 }
 
-getList();
+onMounted(() => {
+  const merchantId = route.query && route.query.id;
+  if (merchantId) {
+    // 如果传入了ID，则查询特定供应商
+    getMerchant(merchantId).then(response => {
+      merchantList.value = [response.data];
+      total.value = 1;
+      loading.value = false;
+    });
+  } else {
+    // 如果没有传入ID，则查询所有供应商
+    getList();
+  }
+});
 </script>
