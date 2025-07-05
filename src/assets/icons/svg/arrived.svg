@@ -1,0 +1,45 @@
+<svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
+  <!-- 卡车主体 - 使用更复杂的path -->
+  <path d="M20 60h88v40H20z" fill="#165DFF" stroke="#0F4CD1" stroke-width="2"/>
+  
+  <!-- 卡车驾驶室 - 更精细的设计 -->
+  <path d="M20 40h32v20H20z" fill="#165DFF"/>
+  <path d="M24 44h8v8H24z" fill="#FFFFFF" opacity="0.8"/>
+  <path d="M36 44h8v8H36z" fill="#FFFFFF" opacity="0.8"/>
+  
+  <!-- 卡车轮子 - 更精细的轮子设计 -->
+  <circle cx="32" cy="100" r="10" fill="#E0E2E5" stroke="#C0C4CC" stroke-width="2"/>
+  <circle cx="96" cy="100" r="10" fill="#E0E2E5" stroke="#C0C4CC" stroke-width="2"/>
+  <circle cx="32" cy="100" r="4" fill="#909399"/>
+  <circle cx="96" cy="100" r="4" fill="#909399"/>
+  
+  <!-- 货物箱子 - 更精细的箱子设计 -->
+  <path d="M60 68h16v12H60z" fill="#FFFFFF" stroke="#E0E2E5" stroke-width="1"/>
+  <path d="M80 68h16v12H80z" fill="#FFFFFF" stroke="#E0E2E5" stroke-width="1"/>
+  <path d="M60 82h16v12H60z" fill="#FFFFFF" stroke="#E0E2E5" stroke-width="1"/>
+  <path d="M80 82h16v12H80z" fill="#FFFFFF" stroke="#E0E2E5" stroke-width="1"/>
+  
+  <!-- 货物标签 - 更精细的标签设计 -->
+  <path d="M62 70h12v2H62z" fill="#00B42A"/>
+  <path d="M82 70h12v2H82z" fill="#F7BA2E"/>
+  <path d="M62 84h12v2H62z" fill="#165DFF"/>
+  <path d="M82 84h12v2H82z" fill="#FF6B35"/>
+  
+  <!-- 到货箭头 - 更精细的箭头设计 -->
+  <path d="M64 20L64 10M58 14L64 10L70 14" stroke="#00B42A" stroke-width="3" fill="none" stroke-linecap="round"/>
+  
+  <!-- 到货符号 - 更复杂的运输图标设计 -->
+  <path d="M45 25h38v16H45z" fill="#00B42A" rx="2"/>
+  <path d="M49 29h30v8H49z" fill="#FFFFFF"/>
+  <path d="M55 35h18v4H55z" fill="#165DFF"/>
+  <path d="M59 37h10v2H59z" fill="#FFFFFF"/>
+  
+  <!-- 运输线条 - 更精细的运输元素 -->
+  <path d="M52 32h24v2H52z" fill="#FFFFFF"/>
+  <path d="M54 36h20v2H54z" fill="#FFFFFF"/>
+  <path d="M56 40h16v2H56z" fill="#FFFFFF"/>
+  
+  <!-- 运输细节 - 添加更多精细元素 -->
+  <path d="M58 44h12v2H58z" fill="#FFFFFF"/>
+  <path d="M60 48h8v2H60z" fill="#FFFFFF"/>
+</svg> 
