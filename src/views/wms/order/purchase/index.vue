@@ -199,7 +199,7 @@
               href="javascript:;"
               class="merchant-link"
               style="color: #409EFF; text-decoration: underline; cursor: pointer;"
-              @click.stop.prevent="handleMerchantClick(row.merchantId)"
+              @click.stop.prevent="handleMerchantClick(String(row.merchantId))"
             >
               {{ useWmsStore().merchantMap.get(row.merchantId)?.merchantName }}
             </a>
@@ -240,7 +240,7 @@
                 {{ scope.row.orderStatus === 0 ? '审核' : '弃审' }}
               </el-button>
 
-              <el-button link type="primary" @click="handleDelete(scope.row)" v-hasPermi="['wms:purchase:all']" :disabled="scope.row.orderStatus !== 1">下推</el-button>
+              <el-button link type="primary" @click="handlePushDown(scope.row)" v-hasPermi="['wms:purchase:all']" :disabled="scope.row.orderStatus !== 1">下推</el-button>
             </div>
             <div class="mt10">
               <el-popover
@@ -271,6 +271,12 @@
         />
       </el-row>
     </el-card>
+    <ArrivedOrderPushDownDialog
+      v-model:visible="showPushDownDialog"
+      :order="currentOrder"
+      :details="currentDetails"
+      @confirm="onPushDownConfirm"
+    />
   </div>
 </template>
 
@@ -281,6 +287,9 @@ import {useWmsStore} from "../../../../store/modules/wms";
 import {listByReceiptOrderId} from "@/api/wms/purchaseOrderDetail";
 import {ElMessageBox} from "element-plus";
 import receiptPanel from "@/components/PrintTemplate/receipt-panel";
+import { pushDownPurchaseOrder } from "@/api/wms/arrivedOrder";
+import { onMounted } from 'vue';
+import ArrivedOrderPushDownDialog from '@/components/ArrivedOrderPushDownDialog.vue';
 
 const { proxy } = getCurrentInstance();
 const {order_status, wms_receipt_status, wms_receipt_type, wms_purchase_order_document_type_id } = proxy.useDict("order_status" ,"wms_receipt_status", "wms_receipt_type" ,"wms_purchase_order_document_type_id");
@@ -310,6 +319,13 @@ const data = reactive({
 });
 
 const { queryParams } = toRefs(data);
+
+const wmsStore = useWmsStore();
+
+onMounted(() => {
+  wmsStore.getMerchantList(); // 加载供应商列表
+  getList(); // 加载采购订单列表
+});
 
 /** 查询采购订单列表 */
 function getList() {
@@ -367,7 +383,6 @@ function handleDelete(row) {
 }
 
 function handleUpdate(row) {
-  console.log('handleUpdate id:', row.id)
   proxy.$router.push({ path: "/purchaseOrderEdit",  query: { id: row.id } });
 }
 
@@ -477,7 +492,6 @@ function handleExpandExchange(value, expandedRows) {
 }
 
 function loadReceiptOrderDetail(row) {
-  console.log('loadReceiptOrderDetail id:', row.id)
   const index = receiptOrderList.value.findIndex(it => it.id === row.id)
   detailLoading.value[index] = true
   listByReceiptOrderId(row.id).then(res => {
@@ -543,7 +557,31 @@ function getRowKey(row) {
 // onActivated(() => {
 //   getList(); // 注释：切换tab时不再自动查询
 // });
-getList();
+// getList();
+
+const showPushDownDialog = ref(false);
+const currentOrder = ref({});
+const currentDetails = ref([]);
+
+function handlePushDown(row) {
+  proxy.$router.push({ path: '/purchaseToArrivedOrder', query: { id: row.id } });
+}
+
+function onPushDownConfirm(data) {
+  loading.value = true;
+  pushDownPurchaseOrder(data)
+    .then(() => {
+      proxy.$modal.msgSuccess('下推成功');
+      getList();
+    })
+    .catch(() => {
+      proxy.$modal.msgError('下推失败');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+
 </script>
 <style lang="scss">
 .el-statistic__content {

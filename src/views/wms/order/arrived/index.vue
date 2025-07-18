@@ -203,17 +203,6 @@
             </a>
           </template>
         </el-table-column>
-
-        <el-table-column label="业务员" align="left" width="150">
-          <template #default="{ row }">
-            <div>{{ row.sysUserVo.userName }}</div>
-          </template>
-        </el-table-column>
-        <el-table-column label="到货部门" align="left">
-          <template #default="{ row }">
-            <div>{{ row.sysDeptVo.deptName }}</div>
-          </template>
-        </el-table-column>
         <el-table-column label="备注" prop="remark" />
         <el-table-column label="操作" align="right" class-name="small-padding fixed-width" width="120">
           <template #default="scope">
@@ -227,16 +216,16 @@
                 :content="'到货单【' + scope.row.orderNo + '】已' + (scope.row.orderStatus === 0 ? '开立' : '审核') + '，无法修改！' "
               >
                 <template #reference>
-                  <el-button link type="primary" @click="handleUpdate(scope.row)" v-hasPermi="['wms:receipt:all']" :disabled="[-1, 1].includes(scope.row.orderStatus)">修改</el-button>
+                  <el-button link type="primary" @click="handleUpdate(scope.row)" v-hasPermi="['wms:arrived:all']" :disabled="[-1, 1].includes(scope.row.orderStatus)">修改</el-button>
                 </template>
               </el-popover>
-              <el-button link type="primary" @click="handleGoDetail(scope.row)" v-hasPermi="['wms:receipt:all']">{{ expandedRowKeys.includes(scope.row.id) ? '收起' : '查看' }}</el-button>
+              <el-button link type="primary" @click="handleGoDetail(scope.row)" v-hasPermi="['wms:arrived:query']">{{ expandedRowKeys.includes(scope.row.id) ? '收起' : '查看' }}</el-button>
 
-              <el-button link type="primary" @click="handleAudit(scope.row)" v-hasPermi="['wms:receipt:all']">
+              <el-button link type="primary" @click="handleAudit(scope.row)" v-hasPermi="['wms:arrived:all']">
                 {{ scope.row.orderStatus === 0 ? '审核' : '弃审' }}
               </el-button>
 
-              <el-button link type="primary" @click="handleDelete(scope.row)" v-hasPermi="['wms:receipt:all']" :disabled="scope.row.orderStatus !== 1">下推</el-button>
+              <el-button link type="primary" @click="handleDelete(scope.row)" v-hasPermi="['wms:arrived:all']" :disabled="scope.row.orderStatus !== 1">下推</el-button>
             </div>
             <div class="mt10">
               <el-popover
@@ -248,10 +237,10 @@
                 :content="'到货单【' + scope.row.orderNo + '】已审核，无法删除！' "
               >
                 <template #reference>
-                  <el-button link type="danger" @click="handleDelete(scope.row)" v-hasPermi="['wms:receipt:all']" :disabled="scope.row.orderStatus === 1">删除</el-button>
+                  <el-button link type="danger" @click="handleDelete(scope.row)" v-hasPermi="['wms:arrived:all']" :disabled="scope.row.orderStatus === 1">删除</el-button>
                 </template>
               </el-popover>
-              <el-button link type="primary" @click="handlePrint(scope.row)" v-hasPermi="['wms:receipt:all']">打印</el-button>
+              <el-button link type="primary" @click="handlePrint(scope.row)" v-hasPermi="['wms:arrived:all']">打印</el-button>
             </div>
           </template>
         </el-table-column>
@@ -311,24 +300,19 @@ const { queryParams } = toRefs(data);
 function getList() {
   loading.value = true;
   const query = {...queryParams.value}
-  if (query.orderStatus === -2) {
-    query.orderStatus = null
-  }
-  if (query.documentTypeId === -1) {
-    query.documentTypeId = null
-  }
-  if (query.optType === -1) {
-    query.optType = null
-  }
-  listArrivedOrder(query).then(response => {
-    arrivedOrderList.value = response.rows;
-    total.value = response.total;
-    for (let i = 0; i < total; i++) {
-      detailLoading.value.push(false)
-    }
-    expandedRowKeys.value = []
-    loading.value = false;
-  });
+  if (query.orderStatus === -2) query.orderStatus = null
+  if (query.documentTypeId === -1) query.documentTypeId = null
+  if (query.optType === -1) query.optType = null
+  listArrivedOrder(query)
+    .then(response => {
+      arrivedOrderList.value = response.rows;
+      total.value = response.total;
+      loading.value = false;
+    })
+    .catch(error => {
+      console.error('接口报错', error);
+      loading.value = false;
+    });
 }
 
 /** 搜索按钮操作 */
@@ -505,7 +489,7 @@ function handleRowClick(row, column, event) {
     return;
   }
   // 如果点击的是商品名称的a标签（item-link）或供应商链接（merchant-link），则不展开/收起
-  if (event?.target?.closest('a') && 
+  if (event?.target?.closest('a') &&
       (event?.target?.closest('a').classList.contains('item-link') ||
        event?.target?.closest('a').classList.contains('merchant-link'))) {
     return;
@@ -544,4 +528,4 @@ getList();
 .el-table .vertical-top-cell {
   vertical-align: top
 }
-</style> 
+</style>

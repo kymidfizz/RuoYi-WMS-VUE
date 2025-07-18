@@ -51,3 +51,12 @@ export function arrived(data) {
     data: data
   })
 }
+
+// 下推采购订单生成到货单
+export function pushDownPurchaseOrder(data) {
+  return request({
+    url: '/wms/arrivedOrder/addByPurchaseOrder',
+    method: 'post',
+    data
+  })
+}

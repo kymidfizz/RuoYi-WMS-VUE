@@ -58,4 +58,4 @@ export function updateDetailById(id) {
     method: 'put',
     data: { id: id }
   })
-} 
+}

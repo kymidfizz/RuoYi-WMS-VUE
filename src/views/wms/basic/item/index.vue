@@ -5,6 +5,18 @@
         <el-form-item label="商品编号" prop="itemCode">
           <el-input v-model="queryParams.itemCode" placeholder="请输入商品编号" clearable @keyup.enter="handleQuery"/>
         </el-form-item>
+        <el-form-item label="商品分类" prop="itemCategory">
+          <el-tree-select
+            v-model="queryParams.itemCategory"
+            :data="itemCategoryTreeSelectList"
+            :props="{ value: 'id', label: 'label', children: 'children' }"
+            value-key="id"
+            placeholder="请选择分类"
+            clearable
+            style="width: 200px"
+            @change="handleQuery"
+          />
+        </el-form-item>
         <el-form-item label="商品名称" prop="itemName">
           <el-input v-model="queryParams.itemName" placeholder="请输入商品名称" clearable @keyup.enter="handleQuery"/>
         </el-form-item>
@@ -25,57 +37,20 @@
       </el-form>
     </el-card>
     <el-card class="mt20">
-      <div style="display: flex;align-items: start">
-        <div>
-          <div style="display: flex;align-items: center;justify-content: space-between">
-            <span style="font-size: 18px;line-height: 18px">商品分类</span>
-            <el-button class="mr10" style="font-size:12px;line-height: 14px" plain
-                     @click="handleAddType(false)"
-                     type="primary" icon="Plus">新增分类
-            </el-button>
-          </div>
-          <el-tree
-            :data="itemCategoryTreeOptionsList"
-            :props="{ value: 'id', label: 'label', children: 'children' }"
-            value-key="id"
-            style="width: 400px;"
-            class="mr10 mt10"
-            @nodeClick="handleQueryType"
-            :default-expand-all="true"
-            :highlight-current="true"
-            node-key="label"
-            current-node-key="全部"
-            draggable
-            :allow-drop="collapse"
-            @node-drop="handleNodeDrop"
-            :expand-on-click-node="false"
-          >
-            <template #default="{ node, data }">
-            <span class="custom-tree-node">
-              <span>{{ node.label }}</span>
-              <span>
-                <el-button type="primary" @click.stop="append(data)" link
-                         v-if="data.label !== '全部' && node.level < 2" icon="Plus" style="font-size: 12px">新增子分类</el-button>
-                <el-button type="primary" @click.stop="remove(node, data)" link
-                         v-if="data.label !== '全部'" icon="Delete" style="font-size: 12px">删除</el-button>
-                <el-button type="primary" icon="Edit" @click.stop="edit(node, data)" link
-                         v-if="data.label !== '全部'" style="font-size: 12px">修改</el-button>
-              </span>
-            </span>
-            </template>
-          </el-tree>
+      <!-- 商品列表在下方 -->
+      <div style="width: 100%;position: relative; margin-top: 24px;">
+        <div style="display: flex;align-items: start;justify-content: space-between">
+          <span class="mr10" style="font-size: 18px;">商品列表</span>
+          <el-button type="primary" plain icon="Plus" @click="handleAdd" class="mb10">新增商品</el-button>
         </div>
-        <div style="width: 100%;position: relative">
-          <div style="display: flex;align-items: start;justify-content: space-between">
-            <span class="mr10" style="font-size: 18px;">商品列表</span>
-            <el-button type="primary" plain icon="Plus" @click="handleAdd" class="mb10">新增商品</el-button>
-          </div>
-          <el-table :data="itemList" @selection-change="handleSelectionChange" :span-method="spanMethod" border empty-text="暂无商品" v-loading="loading" cell-class-name="my-cell">
+        <el-table :data="itemList" @selection-change="handleSelectionChange" :span-method="spanMethod" border empty-text="暂无商品" v-loading="loading" cell-class-name="my-cell">
             <el-table-column label="商品信息" prop="itemId">
               <template #default="{ row }">
                 <div>{{ row.item.itemName + (row.item.itemCode ? ('(' +  row.item.itemCode + ')') : '') }}</div>
                 <div v-if="row.item.itemBrand">{{ row.item.itemBrand ? ('品牌：' + useWmsStore().itemBrandMap.get(row.item.itemBrand)?.brandName) : '' }}</div>
-                <div v-if="row.item.itemCategory">{{ row.item.itemCategory ? ('分类：' + useWmsStore().itemCategoryMap.get(row.item.itemCategory)?.categoryName) : '' }}</div>
+                <div v-if="row.item.itemCategory && useWmsStore().itemCategoryMap.size">
+                  分类：{{ useWmsStore().itemCategoryMap.get(row.item.itemCategory)?.categoryName }}
+                </div>
               </template>
             </el-table-column>
             <el-table-column label="规格信息" prop="skuName" align="left">
@@ -127,7 +102,6 @@
           </el-table>
           <pagination v-show="total>0" :total="total" v-model:page="queryParams.pageNum"
                       v-model:limit="queryParams.pageSize" @pagination="getList"/>
-        </div>
       </div>
     </el-card>
     <!-- 添加或修改物料对话框 -->
@@ -183,6 +157,53 @@
                       :label="item.brandName"
                       :value="item.id"
                     ></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item>
+                  <el-checkbox v-model="form.enableBatch" :true-label="1" :false-label="0">启用批次管理</el-checkbox>
+                  <el-checkbox v-model="form.enableExpiry" :true-label="1" :false-label="0" style="margin-left: 16px;">启用效期管理</el-checkbox>
+                  <el-checkbox v-model="form.enableSerial" :true-label="1" :false-label="0" style="margin-left: 16px;">启用序列号</el-checkbox>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row :gutter="24">
+              <el-col :span="8">
+                <el-form-item label="生产厂家" prop="manufacturer">
+                  <el-input v-model="form.manufacturer" placeholder="请输入生产厂家"/>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row :gutter="24">
+              <el-col :span="8">
+                <el-form-item label="型号" prop="model">
+                  <el-input v-model="form.model" placeholder="请输入型号" style="width: 100%;" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="助记码" prop="mnemonicCode">
+                  <el-input v-model="form.mnemonicCode" placeholder="请输入助记码" style="width: 100%;" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="英文名称" prop="englishName">
+                  <el-input v-model="form.englishName" placeholder="请输入英文名称" style="width: 100%;" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row v-if="form.enableExpiry">
+              <el-col :span="8">
+                <el-form-item label="有效期" prop="expiryValue">
+                  <el-input-number v-model="form.expiryValue" placeholder="请输入有效期" style="width: 100%;" :disabled="!form.enableExpiry" :controls="false"/>
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="有效期单位" prop="expiryUnit">
+                  <el-select v-model="form.expiryUnit" placeholder="请选择单位" :disabled="!form.enableExpiry" style="width: 100%;">
+                    <el-option label="年" value="年"/>
+                    <el-option label="月" value="月"/>
+                    <el-option label="日" value="日"/>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -278,7 +299,6 @@
           </el-form>
         </el-card>
       </div>
-
       <template #footer>
         <div class="dialog-footer">
           <el-button :loading="buttonLoading" type="primary" @click="submitForm">确 定</el-button>
@@ -323,7 +343,7 @@
 
 <script setup name="Item">
 import {getItem, delItem, addItem, updateItem} from '@/api/wms/item';
-import {computed, getCurrentInstance, nextTick, onMounted, reactive, ref, toRefs} from 'vue';
+import {computed, getCurrentInstance, nextTick, onMounted, reactive, ref, toRefs, watch} from 'vue';
 import {ElForm, ElTree, ElTreeSelect} from 'element-plus';
 import {
   updateItemCategory,
@@ -337,6 +357,8 @@ import {useRoute} from "vue-router";
 import Qrcode from 'qrcode'
 import JSBarcode from 'jsbarcode'
 import {useWmsStore} from '@/store/modules/wms'
+// 1. 引入MerchantSelect组件
+import MerchantSelect from '@/views/components/MerchantSelect.vue';
 
 const barcode = ref(null)
 const route = useRoute()
@@ -400,6 +422,7 @@ const categoryDialog = reactive({
   title: ''
 });
 const showParent = ref(false)
+// 1. initFormData中移除expiryWarningDays
 const initFormData = {
   id: undefined,
   itemCode: undefined,
@@ -408,7 +431,8 @@ const initFormData = {
   unit: undefined,
   itemBrand: undefined,
   remark: undefined,
-}
+  enableBatch: 1,
+};
 const initCategoryFormData = {
   id: undefined,
   parentId: undefined,
@@ -575,8 +599,9 @@ const cancelType = () => {
 }
 /** 表单重置 */
 const reset = () => {
-  form.value = {...initFormData};
+  form.value = { ...initFormData };
   itemFormRef.value.resetFields();
+  form.value.enableBatch = 1;
 }
 
 /** 表单重置 */
@@ -610,6 +635,7 @@ const handleAdd = () => {
   dialog.title = "新增商品";
   nextTick(async () => {
     reset();
+    form.value.enableBatch = 1; // 再次确保
   });
 }
 /** 修改按钮操作 */
@@ -757,17 +783,27 @@ onMounted(() => {
     });
   }
 });
-</script>
-<style>
-.custom-tree-node {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 14px;
-  padding-right: 8px;
-}
 
+// setup中添加watch实现效期管理联动
+watch(() => form.enableExpiry, (val) => {
+  if (!val) {
+    form.expiryValue = undefined;
+    form.expiryUnit = undefined;
+  }
+});
+
+// 2. setup中批次管理默认勾选
+form.enableBatch = 1;
+
+// 3. setup中添加供应商远程搜索逻辑
+
+// 2. 新增商品表单默认供应商选择区
+
+// 3. 移除initFormData、form等数据对象中的defaultSupplier字段
+
+</script>
+<style scoped>
+/* 移除让el-input-number输入内容和placeholder左对齐的样式 */
 .el-tree-node__content {
   display: flex;
   align-items: center;
@@ -782,5 +818,7 @@ onMounted(() => {
 .el-table__empty-text {
   width: 100%;
 }
-
+::v-deep .el-input-number .el-input__inner {
+  text-align: left !important;
+}
 </style>

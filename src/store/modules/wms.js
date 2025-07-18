@@ -29,11 +29,13 @@ export const useWmsStore = defineStore('wms', () => {
   const getMerchantList = () => {
     listMerchantNoPage({}).then((res) => {
       merchantList.value = res.data;
+
       const map = new Map();
       merchantList.value.forEach((supplier) => {
-        map.set(supplier.id, supplier);
+        map.set(String(supplier.id), supplier);
       });
       merchantMap.value = map;
+      console.log(map)
     });
   }
 
